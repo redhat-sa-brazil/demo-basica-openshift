@@ -297,7 +297,7 @@ node('maven') {
 
     stage 'Build image and deploy to dev'
     echo 'Building docker image'
-    buildApp(app + '-dev', gitUrl, app, ocpurl, token)
+    buildApp(app + '-dev', gitUrl, app, ocpUrl, token)
 
     stage 'Deploy to QA'
     echo 'Deploying to QA'
@@ -310,8 +310,8 @@ node('maven') {
     deploy(app + '-dev', app + '-prd', app, 'producao', token)
 }
 
-def buildApp(String project, String gitUrl, String app, String ocpurl, String token){
-    projectSet(project, ocpurl, token)
+def buildApp(String project, String gitUrl, String app, String ocpUrl, String token){
+    projectSet(project, ocpUrl, token)
 
     sh "oc new-build php:7.0~${gitUrl} --name=${app} -n ${project}"
     sh "oc logs -f bc/${app} -n ${project}"
@@ -322,14 +322,14 @@ def buildApp(String project, String gitUrl, String app, String ocpurl, String to
     sh "sleep 10"
 }
 
-def projectSet(String project, String ocpurl, String token) {
-	sh "oc login --insecure-skip-tls-verify=true ${ocpurl} --token=${token}"
+def projectSet(String project, String ocpUrl, String token) {
+	sh "oc login --insecure-skip-tls-verify=true ${ocpUrl} --token=${token}"
     sh "oc new-project ${project} || echo 'Project exists'"
     sh "oc project ${project}"
 }
 
-def deploy(String origProject, String project, String app, String env, String ocpurl, String token){
-    projectSet(project, ocpurl, token)
+def deploy(String origProject, String project, String app, String env, String ocpUrl, String token){
+    projectSet(project, ocpUrl, token)
     sh "oc policy add-role-to-user system:image-puller system:serviceaccount:${project}:default -n ${origProject}"
     sh "oc tag ${origProject}/${app}:latest ${project}/${app}:latest"
     sh "echo 'usuario=teste-${env}\nurl=http://${env}-url' > hello${env}.properties"
