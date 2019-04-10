@@ -339,7 +339,7 @@ def deploy(String origProject, String project, String app, String ambiente, Stri
 
 def appDeploy(String app, String project, String ambiente){
     sh "oc new-app ${app} -l app=${app} -n ${project} || echo 'Aplication already Exists'"
-    sh "oc volumes dc/${app} --add --name=hello${ambiente}conf --mount-path=/opt/ --configmap-name=hello${ambiente}conf --type=configmap"
+    sh "oc volumes dc/${app} --add --name=hello${ambiente}conf --mount-path=/data --configmap-name=hello${ambiente}conf --type=configmap"
     sh "oc expose service ${app} -n ${project} || echo 'Service already exposed'"
 }
 ----
