@@ -32,8 +32,8 @@ echo "<br>";
 
 ### Criar app no Openshift
 
-	* Criar projeto "cliente"
-	** Criar app "hello-world" PHP 7.0
+	* Criar projeto com o nome do cliente
+	** Criar app "hello-world" a partir do template "PHP" versão 7.0
 		Name::   hello-world
 		Git Repository:: https://github.com/guaxinim/demo-openshift.git
 
@@ -205,7 +205,7 @@ if (file_exists($filename)) {
 	**	  cpu: 200           20% de cpu (o mesmo para request e limit)
 	**	  memoria: 100m                  (o mesmo para request e limit)
 
-	Fork Bomb (copiar do arquivo original):
+	Fork Bomb:
 
 	----
 	while :; do _+=( $((++__)) ); done
@@ -282,9 +282,10 @@ if (file_exists($filename)) {
     * Deletar projeto cliente. +
       `oc delete project cliente`
 
-    * Entrar no projeto CI-CD
+    * Criar projeto "ci-cd-<cliente>"
 	* Subir jenkins  (ephemeral)
 	* Criar Jenkinsfile no repo
+	* Alterar o conteudo para a URL do Github e nome do cliente correto.
 
 ----
 node('maven') {
