@@ -3,6 +3,7 @@
 SLIDES:
 https://docs.google.com/presentation/d/1LzDT0TK7PJOsLNPipRNlQcjm0ecikLD6FKXF5lXinEs/edit#slide=id.g297305db33_0_0
 
+Solicitar Ambiente "Openshift 3.11 Shared" via RHPDS (https://rhpds.redhat.com).
 
 
 ## Parte 1
