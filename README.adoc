@@ -328,21 +328,23 @@ def projectSet(String project, String ocpUrl, String token) {
     sh "oc project ${project}"
 }
 
-def deploy(String origProject, String project, String app, String env, String ocpUrl, String token){
+def deploy(String origProject, String project, String app, String ambiente, String ocpUrl, String token){
     projectSet(project, ocpUrl, token)
     sh "oc policy add-role-to-user system:image-puller system:serviceaccount:${project}:default -n ${origProject}"
     sh "oc tag ${origProject}/${app}:latest ${project}/${app}:latest"
-    sh "echo 'usuario=teste-${env}\nurl=http://${env}-url' > hello${env}.properties"
-    sh "oc create configmap hello${env}conf --from-file=hello${env}.properties"
-    appDeploy(app, project, env)
+    sh "echo 'usuario=teste-${ambiente}\nurl=http://${ambiente}-url' > hello${ambiente}.properties"
+    sh "oc create configmap hello${ambiente}conf --from-file=hello${ambiente}.properties"
+    appDeploy(app, project, ambiente)
 }
 
-def appDeploy(String app, String project, String env){
+def appDeploy(String app, String project, String ambiente){
     sh "oc new-app ${app} -l app=${app} -n ${project} || echo 'Aplication already Exists'"
-    sh "oc volumes dc/${app} --add --name=hello${env}conf --mount-path=/opt/ --configmap-name=hello${env}conf --type=configmap"
+    sh "oc volumes dc/${app} --add --name=hello${ambiente}conf --mount-path=/opt/ --configmap-name=hello${ambiente}conf --type=configmap"
     sh "oc expose service ${app} -n ${project} || echo 'Service already exposed'"
 }
 ----
+
+
 
 * Mudar para projeto Cliente
 * Criar buildconfig para o Pipeline em **Add to project -> Import YAML/JSON** (Mudar a URL do repo git). 
