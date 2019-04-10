@@ -292,24 +292,26 @@ node('maven') {
 	def app = 'hello-world'
 	def cliente = 'cliente'
 	def gitUrl = 'https://github.com/guaxinim/demo-openshift.git'
+	def ocpUrl = 'https://threescale-1b23.generic.opentlc.com:8443'
+	def token = ''
 
     stage 'Build image and deploy to dev'
     echo 'Building docker image'
-    buildApp(app + '-dev', gitUrl, app)
+    buildApp(app + '-dev', gitUrl, app, ocpurl, token)
 
     stage 'Deploy to QA'
     echo 'Deploying to QA'
-    deploy(app + '-dev', app + '-qa', app, 'homologacao')
+    deploy(app + '-dev', app + '-qa', app, 'homologacao', token)
 
     stage 'Wait for approval'
     input 'Aprove to production?'
 
     stage 'Deploy to Prod'
-    deploy(app + '-dev', app + '-prd', app, 'producao')
+    deploy(app + '-dev', app + '-prd', app, 'producao', token)
 }
 
-def buildApp(String project, String gitUrl, String app){
-    projectSet(project)
+def buildApp(String project, String gitUrl, String app, String ocpurl, String token){
+    projectSet(project, ocpurl, token)
 
     sh "oc new-build php:7.0~${gitUrl} --name=${app} -n ${project}"
     sh "oc logs -f bc/${app} -n ${project}"
@@ -320,15 +322,15 @@ def buildApp(String project, String gitUrl, String app){
     sh "sleep 10"
 }
 
-def projectSet(String project) {
-	sh "oc login -u admin -p redhat@123 https://master.example.com:8443"
-	sh "oc login --insecure-skip-tls-verify=true https://master.rhpds311.openshift.opentlc.com:443 --token=Miu0-D9uNqfVOmyBlLLB8lYWhrL18nFXVxFi7yw5z_c"
+def projectSet(String project, String ocpurl, String token) {
+	sh "oc login -u admin -p admin ${ocpurl}"
+	sh "oc login --insecure-skip-tls-verify=true https://master.rhpds311.openshift.opentlc.com:443 --token=${token}"
     sh "oc new-project ${project} || echo 'Project exists'"
     sh "oc project ${project}"
 }
 
-def deploy(String origProject, String project, String app, String env){
-    projectSet(project)
+def deploy(String origProject, String project, String app, String env, String ocpurl, String token){
+    projectSet(project, ocpurl, token)
     sh "oc policy add-role-to-user system:image-puller system:serviceaccount:${project}:default -n ${origProject}"
     sh "oc tag ${origProject}/${app}:latest ${project}/${app}:latest"
     sh "echo 'usuario=teste-${env}\nurl=http://${env}-url' > hello${env}.properties"
@@ -344,7 +346,7 @@ def appDeploy(String app, String project, String env){
 ----
 
 * Mudar para projeto Cliente
-* Criar buildconfig para o Pipeline  (Add to project - From yaml/json)
+* Criar buildconfig para o Pipeline em **Add to project -> Import YAML/JSON** (Mudar a URL do repo git). 
 
 ----
 kind: "BuildConfig"
