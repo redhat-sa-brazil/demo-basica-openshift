@@ -17,7 +17,7 @@ Solicitar Ambiente "Openshift 3.11 Shared" via RHPDS (https://rhpds.redhat.com).
     demo-openshift
        [x] Initialize this repository with README
 
-* New file (index.php)
+* Criar novo arquivo (index.php) e clicar em commit
 * Código-fonte:
 
 ----
