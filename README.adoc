@@ -301,13 +301,13 @@ node('maven') {
 
     stage 'Deploy to QA'
     echo 'Deploying to QA'
-    deploy(app + '-dev', app + '-qa', app, 'homologacao', token)
+    deploy(app + '-dev', app + '-qa', app, 'homologacao', ocpUrl, token)
 
     stage 'Wait for approval'
     input 'Aprove to production?'
 
     stage 'Deploy to Prod'
-    deploy(app + '-dev', app + '-prd', app, 'producao', token)
+    deploy(app + '-dev', app + '-prd', app, 'producao', ocpUrl, token)
 }
 
 def buildApp(String project, String gitUrl, String app, String ocpUrl, String token){
