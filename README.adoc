@@ -323,8 +323,7 @@ def buildApp(String project, String gitUrl, String app, String ocpurl, String to
 }
 
 def projectSet(String project, String ocpurl, String token) {
-	sh "oc login -u admin -p admin ${ocpurl}"
-	sh "oc login --insecure-skip-tls-verify=true https://master.rhpds311.openshift.opentlc.com:443 --token=${token}"
+	sh "oc login --insecure-skip-tls-verify=true ${ocpurl} --token=${token}"
     sh "oc new-project ${project} || echo 'Project exists'"
     sh "oc project ${project}"
 }
