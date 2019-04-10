@@ -3,21 +3,20 @@
 SLIDES:
 https://docs.google.com/presentation/d/1LzDT0TK7PJOsLNPipRNlQcjm0ecikLD6FKXF5lXinEs/edit#slide=id.g297305db33_0_0
 
-Solicitar Ambiente "Openshift 3.11 Shared" via RHPDS (https://rhpds.redhat.com).
 
 
 ## Parte 1
 
 {nbsp} +
 
-### Criar repositório público "demo-openshift" no github:
+### Criar repositório *demo-openshift* no github:
 
 * Acessar o seu GitHub particular:
   Novo repositorio::
     demo-openshift
        [x] Initialize this repository with README
 
-* New file (index.php)
+* Criar um novo arquivo (index.php) e clicar em *commit*
 * Código-fonte:
 
 ----
@@ -440,8 +439,6 @@ $conn->close();
 
 
 {nbsp} +
-
-## Outros
 
 ### Job
 	* Inserir o Job no projeto cliente
