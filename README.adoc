@@ -299,13 +299,13 @@ node('maven') {
 
     stage 'Deploy to QA'
     echo 'Deploying to QA'
-    deploy(app + '-dev', app + '-qa', app)
+    deploy(app + '-dev', app + '-qa', app, 'homologacao')
 
     stage 'Wait for approval'
     input 'Aprove to production?'
 
     stage 'Deploy to Prod'
-    deploy(app + '-dev', app + '-prd', app)
+    deploy(app + '-dev', app + '-prd', app, 'producao')
 }
 
 def buildApp(String project, String gitUrl, String app){
@@ -314,6 +314,8 @@ def buildApp(String project, String gitUrl, String app){
     sh "oc new-build php:7.0~${gitUrl} --name=${app} -n ${project}"
     sh "oc logs -f bc/${app} -n ${project}"
     sh "oc new-app ${app} -n ${project}"
+    sh "echo 'usuario=teste-dev\nurl=http://dev-url' > hellodev.properties"
+    sh "oc create configmap hellodevconf --from-file=hellodev.properties"
     sh "oc expose service ${app} -n ${project} || echo 'Service already exposed'"
     sh "sleep 10"
 }
@@ -325,15 +327,18 @@ def projectSet(String project) {
     sh "oc project ${project}"
 }
 
-def deploy(String origProject, String project, String app){
+def deploy(String origProject, String project, String app, String env){
     projectSet(project)
     sh "oc policy add-role-to-user system:image-puller system:serviceaccount:${project}:default -n ${origProject}"
     sh "oc tag ${origProject}/${app}:latest ${project}/${app}:latest"
-    appDeploy(app, project)
+    sh "echo 'usuario=teste-${env}\nurl=http://${env}-url' > hello${env}.properties"
+    sh "oc create configmap hello${env}conf --from-file=hello${env}.properties"
+    appDeploy(app, project, env)
 }
 
-def appDeploy(String app, String project){
+def appDeploy(String app, String project, String env){
     sh "oc new-app ${app} -l app=${app} -n ${project} || echo 'Aplication already Exists'"
+    sh "oc volumes dc/${app} --add --name=hello${env}conf --mount-path=/opt/ --configmap-name=hello${env}conf --type=configmap"
     sh "oc expose service ${app} -n ${project} || echo 'Service already exposed'"
 }
 ----
