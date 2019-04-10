@@ -316,8 +316,9 @@ def buildApp(String project, String gitUrl, String app, String ocpUrl, String to
     sh "oc new-build php:7.0~${gitUrl} --name=${app} -n ${project}"
     sh "oc logs -f bc/${app} -n ${project}"
     sh "oc new-app ${app} -n ${project}"
-    sh "echo 'usuario=teste-dev\nurl=http://dev-url' > hellodev.properties"
-    sh "oc create configmap hellodevconf --from-file=hellodev.properties"
+    sh "echo 'usuario=teste-dev\nurl=http://dev-url' > hello.properties"
+    sh "oc create configmap hellodevconf --from-file=hello.properties"
+    sh "oc volumes dc/${app} --add --name=hellodevconf --mount-path=/data --configmap-name=hellodevconf --type=configmap"
     sh "oc expose service ${app} -n ${project} || echo 'Service already exposed'"
     sh "sleep 10"
 }
@@ -332,8 +333,8 @@ def deploy(String origProject, String project, String app, String ambiente, Stri
     projectSet(project, ocpUrl, token)
     sh "oc policy add-role-to-user system:image-puller system:serviceaccount:${project}:default -n ${origProject}"
     sh "oc tag ${origProject}/${app}:latest ${project}/${app}:latest"
-    sh "echo 'usuario=teste-${ambiente}\nurl=http://${ambiente}-url' > hello${ambiente}.properties"
-    sh "oc create configmap hello${ambiente}conf --from-file=hello${ambiente}.properties"
+    sh "echo 'usuario=teste-${ambiente}\nurl=http://${ambiente}-url' > hello.properties"
+    sh "oc create configmap hello${ambiente}conf --from-file=hello.properties"
     appDeploy(app, project, ambiente)
 }
 
