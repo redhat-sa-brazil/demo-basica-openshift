@@ -10,7 +10,7 @@ Solicitar Ambiente "Openshift 3.11 Shared" via RHPDS (https://rhpds.redhat.com).
 
 {nbsp} +
 
-### Criar repositório *demo-openshift* no github:
+### Criar repositório "demo-openshift" no github:
 
 * Acessar o seu GitHub particular:
   Novo repositorio::
