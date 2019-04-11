@@ -345,7 +345,17 @@ def appDeploy(String app, String project, String ambiente){
 }
 ----
 
+* Alterar o arquivo index.php para o conteúdo abaixo:
 
+----
+<?php
+echo "<h1>Olá Mundo v1.0</h1> ";
+echo "IP Interno: " . $_SERVER['SERVER_ADDR'];
+echo "<br>";
+$hello = parse_ini_file('/data/hello.properties');
+echo $hello['usuario']
+?>
+----
 
 * Mudar para projeto Cliente
 * Criar buildconfig para o Pipeline em **Add to project -> Import YAML/JSON** (Mudar a URL do repo git). 
