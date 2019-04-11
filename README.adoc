@@ -51,6 +51,8 @@ echo "<br>";
 	   user admin, pass:: redhat@123
 	   user root, pass:: redhat@123
 
+	* Dar um Copy Login Command e logar no openshift
+
 	* Port forward para conectar ao MySQL
 		** `oc project cliente`
 		** `POD_MYSQL=$(oc get po | grep mysql | cut -f1 -d ' ')`
