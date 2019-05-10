@@ -293,8 +293,8 @@ node('maven') {
 	def app = 'hello-world'
 	def cliente = 'cliente'
 	def gitUrl = 'https://github.com/guaxinim/demo-openshift.git'
-	def ocpUrl = 'https://threescale-1b23.generic.opentlc.com:8443'
-	def token = ''
+        def ocpUrl = 'https://master.rhpds311.openshift.opentlc.com'
+	def token = 'byG7Rb1UfQbuzpaInOT_zwoEzCk4r4SrapFBG7XpcLc'
 
     stage 'Build image and deploy to dev'
     echo 'Building docker image'
@@ -308,6 +308,7 @@ node('maven') {
     input 'Aprove to production?'
 
     stage 'Deploy to Prod'
+    echo 'Deploying to Prod'
     deploy(app + '-dev', app + '-prd', app, 'producao', ocpUrl, token)
 }
 
@@ -317,16 +318,16 @@ def buildApp(String project, String gitUrl, String app, String ocpUrl, String to
     sh "oc new-build php:7.0~${gitUrl} --name=${app} -n ${project}"
     sh "oc logs -f bc/${app} -n ${project}"
     sh "oc new-app ${app} -n ${project}"
-    sh "echo 'usuario=ambiente-dev\nurl=http://dev-url' > hello.properties"
+    sh "echo 'usuario=ambiente-dev' > hello.properties"
     sh "oc create configmap hellodevconf --from-file=hello.properties"
-    sh "oc volumes dc/${app} --add --name=hellodevconf --mount-path=/data --configmap-name=hellodevconf --type=configmap"
-    sh "oc expose service ${app} -n ${project} || echo 'Service already exposed'"
+    sh "oc set volume dc/${app} --add --name=hellodevconf --mount-path=/data --configmap-name=hellodevconf --type=configmap"
+    sh "oc expose service ${app} -n ${project} || echo 'Service ja existe'"
     sh "sleep 10"
 }
 
 def projectSet(String project, String ocpUrl, String token) {
     sh "oc login --insecure-skip-tls-verify=true ${ocpUrl} --token=${token}"
-    sh "oc new-project ${project} || oc delete project ${project};sleep 40;oc new-project ${project}"
+    sh "oc new-project ${project} || echo 'Projeto ja existe'"
     sh "oc project ${project}"
 }
 
@@ -334,15 +335,15 @@ def deploy(String origProject, String project, String app, String ambiente, Stri
     projectSet(project, ocpUrl, token)
     sh "oc policy add-role-to-user system:image-puller system:serviceaccount:${project}:default -n ${origProject}"
     sh "oc tag ${origProject}/${app}:latest ${project}/${app}:latest"
-    sh "echo 'usuario=ambiente-${ambiente}\nurl=http://${ambiente}-url' > hello.properties"
+    sh "echo 'usuario=ambiente-${ambiente}' > hello.properties"
     sh "oc create configmap hello${ambiente}conf --from-file=hello.properties"
     appDeploy(app, project, ambiente)
 }
 
 def appDeploy(String app, String project, String ambiente){
     sh "oc new-app ${app} -l app=${app} -n ${project} || echo 'Aplication already Exists'"
-    sh "oc volumes dc/${app} --add --name=hello${ambiente}conf --mount-path=/data --configmap-name=hello${ambiente}conf --type=configmap"
-    sh "oc expose service ${app} -n ${project} || echo 'Service already exposed'"
+    sh "oc set volume dc/${app} --add --name=hello${ambiente}conf --mount-path=/data --configmap-name=hello${ambiente}conf --type=configmap"
+    sh "oc expose service ${app} -n ${project} || echo 'Service ja existe'"
 }
 ----
 
